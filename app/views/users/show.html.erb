@@ -1,0 +1,155 @@
+<% if flash[:notice] %>
+<p id="notice">
+	<%= flash[:notice] %>
+</p>
+<% end %>
+
+<div class="body">
+	<div class="container">
+		<p id="notice"></p>
+		<div class="row">
+			<div class="col-xs-3">
+				<h2>User info</h2>
+				<%= attachment_image_tag @user, :profile_image, :fill, 60, 60, class: "attachment user profile_image fallback", fallback: "no_image.jpg", size:'60x60'%>
+				<table class="table">
+					<tbody>
+						<tr></tr> 
+						<tr>
+							<th>name</th>
+							<th><%= @user.name %></th>
+						</tr>
+						<tr>
+							<th>introduction</th>
+							<th><%= @user.introduction %></th>
+						</tr>
+						<tr>
+							<th>follows</th>
+							<th><%= link_to @user.following_user.count,user_follows_path(@user.id)%></th>
+						</tr>
+						<tr>
+							<th>followers</th>
+							<th><%= link_to @user.follower_user.count, user_followers_path(@user.id)%></th>
+						</tr>
+					</tbody>
+				</table>
+				<% if current_user != @user %>
+					<%= link_to "チャットルーム",chat_path(@user.id),class: "btn btn-info" %>
+					<% if current_user.following?(@user) %>
+						<%= link_to "フォロー外す", user_relationships_path(@user.id),method: :delete,class: "btn btn-primary" %>
+					<% else %>
+						<%= link_to "フォローする",user_relationships_path(@user.id),method: :post,class: "btn btn-success" %>
+					<% end %>
+				<% end %>
+				<p></p>
+				<div class="row">
+					<% if @user.id == current_user.id %>
+					<%= link_to "", edit_user_path(current_user.id), class: "col-xs-12 btn btn-default glyphicon glyphicon-wrench edit_user_12040"%>
+					<% else %>
+					<%= link_to "", user_path(current_user.id), class: "col-xs-12 btn btn-default glyphicon glyphicon-wrench edit_user_12040"%>
+					<% end %>
+				</div>
+
+				<h2>New book</h2>
+				<%= form_for(@book) do |f| %>
+				<h4>Title</h4>
+				<%= f.text_field :title %>
+				<h4>Body</h4>
+				<%= f.text_area :body %>
+				<p></p>
+				<%= f.submit 'Create Book' %>
+
+				<% end %>
+			</div>
+
+			<div class="col-xs-9">
+				<h2>Books</h2>
+				<table class="table table-hover table-inverse">
+					<thead>
+						<tr> 
+							<th></th>
+							<th>Title</th>
+							<th>Opinion</th>
+							<th>いいね数</th>
+							<th>コメント数</th>
+							<th colspan="4"></th>
+						</tr>
+					</thead>
+
+					<tbody>
+						<% @user.books.each do |book| %>
+						<tr>
+							<td>
+								<%= link_to "" do %>
+									<%= attachment_image_tag @user, :profile_image, :fill, 60, 60, class: "attachment user profile_image fallback", fallback: "no_image.jpg", size:'60x60'%>
+								<% end %>
+							</td>
+							<td>
+								<%= link_to book_path(book) do %>
+									<%= book.title %>
+								<% end %>
+							</td>
+							<td>
+								<%= book.body %>
+							</td>
+							<td><span class="glyphicon glyphicon-heart" style="color:red;"><%= book.favorites.count%></span></td>
+							<td><%= book.book_comments.count%></td>
+						</tr>
+						<% end %>
+					</tbody>
+				</table>
+			</div>
+		</div>
+		<% if @user == current_user %>
+			<h2>Your MAP</h2>
+			<div id='map' class="<%= @user.prefecture_code + @user.city + @user.street %>"></div>
+		<% end %>
+		<style>
+			#map{
+				height: 400px;
+			}
+		</style>
+
+		<script>
+/*
+mapを関数の外で定義(codeAddressでも使うため)
+geocoderを用意
+*/
+
+			let map
+			let geocoder
+
+			function initMap(){
+  				// geocoderを初期化
+  				geocoder = new google.maps.Geocoder()
+  				geocoder.geocode( { 'address': $('#map').attr('class')}, function(results, status) {
+  					if (status == 'OK') {
+　　　　　　　　　　　　	// map.setCenterで地図が移動
+						map.setCenter(results[0].geometry.location);
+
+　　　　　　　　　　　　	// google.maps.MarkerでGoogleMap上の指定位置にマーカが立つ
+						var marker = new google.maps.Marker({
+							map: map,
+							position: results[0].geometry.location
+						});
+					} else {
+						alert('Geocode was not successful for the following reason: ' + status);
+					}
+				});
+
+  				map = new google.maps.Map(document.getElementById('map'), {
+  					center: {lat: -34.397, lng: 150.644},
+  					zoom: 8
+  				});
+			}
+
+			function codeAddress(){
+  				// 入力を取得
+  				let inputAddress = document.getElementById('address').value;
+
+  				// geocodingしたあとmapを移動
+			}
+		</script>
+		<!-- Google Map APIを使用する場合は、下記のコメントアウトを外す -->
+		<script src="https://maps.googleapis.com/maps/api/js?key=<%= ENV['SECRET_KEY'] %>&callback=initMap" async defer></script>
+	</div>
+</div>

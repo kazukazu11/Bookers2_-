@@ -1,0 +1,70 @@
+<% if flash[:notice] %>
+<p id="notice">
+	<%= flash[:notice] %>
+</p>
+<% end %>
+<% if @book.errors.any? %>
+<h3><%= @book.errors.count %>errors prohibited this obj from being saved:</h3>
+<ul>
+	<% @book.errors.full_messages.each do |message| %>
+	<li><%= message %></li>
+	<% end %>
+</ul>
+<% end %>
+<div class="body">
+	<div class="container">
+		<p id="notice"></p>
+		<div class="row">
+			<div class="col-xs-3">
+				<h2>User info</h2>
+				<%= attachment_image_tag @user, :profile_image, :fill, 60, 60, class: "attachment user profile_image fallback", fallback: "no_image.jpg", size:'60x60'%>
+				<table class="table">
+					<tbody>
+						<tr></tr>
+						<tr>
+							<th>name</th>
+							<th><%= @user.name %></th>
+						</tr>
+						<tr>
+							<th>introduction</th>
+							<th><%= @user.introduction %></th>
+						</tr>
+					</tbody>
+				</table>
+				<div class="row">
+					<% if @user.id == current_user.id %>
+					<%= link_to "", edit_user_path(current_user.id), class: "col-xs-12 btn btn-default glyphicon glyphicon-wrench edit_user_12040"%>
+					<% else %>
+					<%= link_to "", user_path(current_user.id), class: "col-xs-12 btn btn-default glyphicon glyphicon-wrench edit_user_12040"%>
+					<% end %>
+				</div>
+
+				<h2>New book</h2>
+				<%= form_for(@book) do |f| %>
+				<h4>Title</h4>
+				<%= f.text_field :title %>
+				<h4>Body</h4>
+				<%= f.text_area :body %>
+				<p></p>
+				<%= f.submit 'Create Book' %>
+
+				<% end %>
+			</div> 
+			<div class="col-xs-9">
+				<h2>Book detail</h2>
+				<table class='table'>
+		  			<tr class="book_<%= @book_data.id %>">
+        				<%= render 'detail', book: @book_data %>
+      				</tr>
+    			</table>
+				<table class="show-tb comment_<%= @book_data.id %>">
+      				<%= render 'comment', book_comments: @book_comments %>
+    			</table>
+				<%= form_with model:[@book_data,@book_comment], data: {remote: true} do |f| %>
+					<%= f.text_area :comment, size:"90x5" %>
+					<%= f.submit '送信'%>
+				<% end %>
+			</div>
+		</div>
+	</div>
+</div>

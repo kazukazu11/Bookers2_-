@@ -1,0 +1,4 @@
+$("textarea").val("");
+//下の@bookはbook_comments_controllerの@book
+$(".book_<%= @book.id %>").html("<%= j(render 'books/detail', book: @book ) %>");  //＜＝これにより、_detail.html.erbのコメント数も非同期で切り替わる
+$(".comment_<%= @book.id %>").html("<%= j(render 'books/comment', book_comments: @book.book_comments ) %>"); 

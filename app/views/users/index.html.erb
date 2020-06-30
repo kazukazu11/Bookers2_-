@@ -1,0 +1,70 @@
+<% if flash[:notice] %>
+<p id="notice">
+	<%= flash[:notice] %>
+</p>
+<% end %>
+
+<div class="body">
+	<div class="container">
+		<p id="notice"></p>
+		<div class="row">
+			<div class="col-xs-3">
+				<h2>User info</h2>
+				<%= attachment_image_tag current_user, :profile_image, :fill, 60, 60, class: "attachment user profile_image fallback", fallback: "no_image.jpg", size:'60x60'%>
+				<table class="table">
+					<tbody>
+						<tr></tr>
+						<tr>
+							<th>name</th>
+							<th><%= current_user.name %></th>
+						</tr>
+						<tr>
+							<th>introduction</th>
+							<th><%= current_user.introduction %></th>
+						</tr>
+						<tr>
+							<th>住所</th>
+							<th><%= current_user.prefecture_code %>　<%= current_user.city %>　<%= current_user.street %></th>
+						</tr>
+						<tr>
+							<th>follows</th>
+							<th><%= link_to current_user.following_user.count,user_follows_path(current_user.id)%></th>
+						</tr>
+						<tr>
+							<th>followers</th>
+							<th><%= link_to current_user.follower_user.count, user_followers_path(current_user.id)%></th>
+						</tr>
+					</tbody>
+				</table>
+				<% if current_user.following?(current_user) %>
+					<%= link_to "フォロー外す", user_relationships_path(current_user.id),method: :delete,class: "btn btn-primary" %>
+				<% else %>
+					<% link_to "フォローする",user_relationships_path(current_user.id),method: :post,class: "btn btn-success" %>
+				<% end %>
+				<div class="row">
+					<% if current_user.id == current_user.id %>
+					<%= link_to "", edit_user_path(current_user.id), class: "col-xs-12 btn btn-default glyphicon glyphicon-wrench edit_user_12040"%>
+					<% else %>
+					<%= link_to "", user_path(current_user.id), class: "col-xs-12 btn btn-default glyphicon glyphicon-wrench edit_user_12040"%>
+					<% end %>
+				</div>
+				
+				<h2>New book</h2>
+				<%= form_for(@book) do |f| %>
+				<h4>Title</h4>
+				<%= f.text_field :title %>
+				<h4>Body</h4>
+				<%= f.text_area :body %>
+				<p></p>
+				<%= f.submit 'Create Book' %>
+
+				<% end %>
+			</div>
+
+			<div class="col-xs-9">
+				<h2>Users</h2>
+				<%= render 'index',users: @users %>
+			</div>
+		</div>
+	</div>
+</div>
